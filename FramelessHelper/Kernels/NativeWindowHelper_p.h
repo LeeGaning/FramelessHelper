@@ -3,34 +3,39 @@
 
 #include "NativeWindowHelper.h"
 
-class NativeWindowHelperPrivate
-{
+class NativeWindowHelperPrivate {
     Q_DECLARE_PUBLIC(NativeWindowHelper)
 
-public:
+   public:
     NativeWindowHelperPrivate();
     virtual ~NativeWindowHelperPrivate();
-protected:
+
+   protected:
     NativeWindowHelper *q_ptr;
 
-public:
+   public:
     void updateWindowStyle();
     int hitTest(int x, int y) const;
     bool isMaximized() const;
+    bool disableMaximized() const;
 
-public:
+   public:
     QMargins draggableMargins() const;
     QMargins maximizedMargins() const;
-public:
-    QWindow            *window;
+
+   public:
+    QWindow *window;
     NativeWindowTester *tester;
-public:
+
+   public:
     HWND oldWindow;
 
-public:
-    QRect availableGeometry() const;
-public:
+   public:
+    QRect availableGeometry();
+
+   public:
     qreal scaleFactor;
+    QRect oldRect;
 };
 
-#endif // NATIVEWINDOWHELPER_P_H
+#endif  // NATIVEWINDOWHELPER_P_H

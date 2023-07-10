@@ -4,58 +4,64 @@
 #include <QWidget>
 
 class FramelessHelperPrivate;
-class FramelessHelper : public QObject
-{
+class FramelessHelper : public QObject {
     Q_OBJECT
     Q_DECLARE_PRIVATE(FramelessHelper)
 
-public:
+   public:
     explicit FramelessHelper(QWidget *parent = nullptr);
     virtual ~FramelessHelper();
 
-public:
+   public:
     void setDraggableMargins(int left, int top, int right, int bottom);
     void setMaximizedMargins(int left, int top, int right, int bottom);
-public:
+
+   public:
     void setDraggableMargins(const QMargins &margins);
     void setMaximizedMargins(const QMargins &margins);
-public:
+
+   public:
     QMargins draggableMargins() const;
     QMargins maximizedMargins() const;
 
-public:
+   public:
     void addIncludeItem(QWidget *item);
     void removeIncludeItem(QWidget *item);
-public:
+
+   public:
     void addExcludeItem(QWidget *item);
     void removeExcludeItem(QWidget *item);
 
-signals:
+   signals:
     void titleBarHeightChanged(int newValue);
-public slots:
+   public slots:
     void setTitleBarHeight(int value);
-public:
+
+   public:
     int titleBarHeight() const;
 
-signals:
+   signals:
     void scaleFactorChanged(qreal factor);
-public:
+
+   public:
     qreal scaleFactor() const;
 
-signals:
+   signals:
     void maximizedChanged(bool maximized);
-public:
-    bool isMaximized() const;
 
-public slots:
+   public:
+    bool isMaximized() const;
+    void setDisableMaximized(bool);
+   public slots:
     void triggerMinimizeButtonAction();
     void triggerMaximizeButtonAction();
     void triggerCloseButtonAction();
 
-protected:
+   protected:
     bool eventFilter(QObject *obj, QEvent *ev) final;
-protected:
+
+   protected:
     QScopedPointer<FramelessHelperPrivate> d_ptr;
 };
 
-#endif // FRAMELESSHELPER_H
+#endif  // FRAMELESSHELPER_H

@@ -7,33 +7,35 @@
 
 #include "Kernels/NativeWindowHelper.h"
 
-class FramelessHelperPrivate : public NativeWindowTester
-{
-public:
+class FramelessHelperPrivate : public NativeWindowTester {
+   public:
     FramelessHelperPrivate();
     virtual ~FramelessHelperPrivate();
 
-public:
+   public:
     QMargins draggableMargins() const final;
     QMargins maximizedMargins() const final;
-
+    bool disableMaximized() const final;
     bool hitTest(const QPoint &pos) const final;
 
-public:
-    QWidget            *window;
+   public:
+    QWidget *window;
     NativeWindowHelper *helper;
-public:
+
+   public:
     QMargins priDraggableMargins;
     QMargins priMaximizedMargins;
-public:
+
+   public:
     QSet<QWidget *> extraTitleBars;
-    int             titleBarHeight;
-public:
+    int titleBarHeight;
+
+   public:
     QSet<QWidget *> includeItems;
     QSet<QWidget *> excludeItems;
 
-public:
+   public:
     bool maximized;
 };
 
-#endif // STYLEDHELPER_P_H
+#endif  // STYLEDHELPER_P_H

@@ -2,97 +2,79 @@
 #include "FramelessHelper_p.h"
 
 #include <windows.h>
-
+#include <QVariant>
 // class FramelessHelper
 
-FramelessHelper::FramelessHelper(QWidget *parent)
-    : QObject(parent)
-    , d_ptr(new FramelessHelperPrivate())
-{
+FramelessHelper::FramelessHelper(QWidget *parent) : QObject(parent), d_ptr(new FramelessHelperPrivate()) {
     Q_D(FramelessHelper);
     d->window = parent;
     Q_CHECK_PTR(parent);
-
-    if (d->window)
-        d->window->installEventFilter(this);
+    if (d->window) d->window->installEventFilter(this);
 }
 
-FramelessHelper::~FramelessHelper()
-{
-}
+FramelessHelper::~FramelessHelper() {}
 
-void FramelessHelper::setDraggableMargins(int left, int top, int right, int bottom)
-{
+void FramelessHelper::setDraggableMargins(int left, int top, int right, int bottom) {
     Q_D(FramelessHelper);
 
     d->priDraggableMargins = QMargins(left, top, right, bottom);
 }
 
-void FramelessHelper::setMaximizedMargins(int left, int top, int right, int bottom)
-{
+void FramelessHelper::setMaximizedMargins(int left, int top, int right, int bottom) {
     Q_D(FramelessHelper);
 
     d->priMaximizedMargins = QMargins(left, top, right, bottom);
 }
 
-void FramelessHelper::setDraggableMargins(const QMargins &margins)
-{
+void FramelessHelper::setDraggableMargins(const QMargins &margins) {
     Q_D(FramelessHelper);
 
     d->priDraggableMargins = margins;
 }
 
-void FramelessHelper::setMaximizedMargins(const QMargins &margins)
-{
+void FramelessHelper::setMaximizedMargins(const QMargins &margins) {
     Q_D(FramelessHelper);
 
     d->priMaximizedMargins = margins;
 }
 
-QMargins FramelessHelper::draggableMargins() const
-{
+QMargins FramelessHelper::draggableMargins() const {
     Q_D(const FramelessHelper);
 
     return d->priDraggableMargins;
 }
 
-QMargins FramelessHelper::maximizedMargins() const
-{
+QMargins FramelessHelper::maximizedMargins() const {
     Q_D(const FramelessHelper);
 
     return d->priMaximizedMargins;
 }
 
-void FramelessHelper::addIncludeItem(QWidget *item)
-{
+void FramelessHelper::addIncludeItem(QWidget *item) {
     Q_D(FramelessHelper);
 
     d->includeItems.insert(item);
 }
 
-void FramelessHelper::removeIncludeItem(QWidget *item)
-{
+void FramelessHelper::removeIncludeItem(QWidget *item) {
     Q_D(FramelessHelper);
 
     d->includeItems.remove(item);
 }
 
-void FramelessHelper::addExcludeItem(QWidget *item)
-{
+void FramelessHelper::addExcludeItem(QWidget *item) {
     Q_D(FramelessHelper);
 
     d->excludeItems.insert(item);
 }
 
-void FramelessHelper::removeExcludeItem(QWidget *item)
-{
+void FramelessHelper::removeExcludeItem(QWidget *item) {
     Q_D(FramelessHelper);
 
     d->excludeItems.remove(item);
 }
 
-void FramelessHelper::setTitleBarHeight(int value)
-{
+void FramelessHelper::setTitleBarHeight(int value) {
     Q_D(FramelessHelper);
 
     if (value != d->titleBarHeight) {
@@ -101,29 +83,31 @@ void FramelessHelper::setTitleBarHeight(int value)
     }
 }
 
-int FramelessHelper::titleBarHeight() const
-{
+int FramelessHelper::titleBarHeight() const {
     Q_D(const FramelessHelper);
 
     return d->titleBarHeight;
 }
 
-qreal FramelessHelper::scaleFactor() const
-{
+qreal FramelessHelper::scaleFactor() const {
     Q_D(const FramelessHelper);
 
     return d->helper ? d->helper->scaleFactor() : 1.0;
 }
 
-bool FramelessHelper::isMaximized() const
-{
+bool FramelessHelper::isMaximized() const {
     Q_D(const FramelessHelper);
 
     return d->maximized;
 }
+void FramelessHelper::setDisableMaximized(bool disable) {
+    Q_D(FramelessHelper);
+    if (d->window) {
+        d->window->setProperty("disableMaximized", disable);
+    }
+}
 
-void FramelessHelper::triggerMinimizeButtonAction()
-{
+void FramelessHelper::triggerMinimizeButtonAction() {
     Q_D(FramelessHelper);
 
     if (d->window) {
@@ -131,11 +115,10 @@ void FramelessHelper::triggerMinimizeButtonAction()
     }
 }
 
-void FramelessHelper::triggerMaximizeButtonAction()
-{
+void FramelessHelper::triggerMaximizeButtonAction() {
     Q_D(FramelessHelper);
-
     if (d->window) {
+        if (d->window->property("disableMaximized").toBool()) return;
         if (d->window->windowState() & Qt::WindowMaximized) {
             d->window->showNormal();
         } else {
@@ -144,8 +127,7 @@ void FramelessHelper::triggerMaximizeButtonAction()
     }
 }
 
-void FramelessHelper::triggerCloseButtonAction()
-{
+void FramelessHelper::triggerCloseButtonAction() {
     Q_D(FramelessHelper);
 
     if (d->window) {
@@ -153,8 +135,7 @@ void FramelessHelper::triggerCloseButtonAction()
     }
 }
 
-bool FramelessHelper::eventFilter(QObject *obj, QEvent *ev)
-{
+bool FramelessHelper::eventFilter(QObject *obj, QEvent *ev) {
     Q_D(FramelessHelper);
 
     if (ev->type() == QEvent::WindowStateChange) {
@@ -168,8 +149,7 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *ev)
             auto w = d->window->windowHandle();
 
             d->helper = new NativeWindowHelper(w, d);
-            connect(d->helper, &NativeWindowHelper::scaleFactorChanged,
-                    this, &FramelessHelper::scaleFactorChanged);
+            connect(d->helper, &NativeWindowHelper::scaleFactorChanged, this, &FramelessHelper::scaleFactorChanged);
             if (!qFuzzyCompare(d->helper->scaleFactor(), 1.0)) {
                 emit scaleFactorChanged(d->helper->scaleFactor());
             }
@@ -185,7 +165,7 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *ev)
 
             d->window->setContentsMargins(0, 0, r, b);
         } else {
-            d->window->setContentsMargins(0 ,0, 0, 0);
+            d->window->setContentsMargins(0, 0, 0, 0);
         }
     }
 #endif
@@ -195,38 +175,23 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *ev)
 
 // class FramelessHelperPrivate
 
-FramelessHelperPrivate::FramelessHelperPrivate()
-    : window(nullptr)
-    , helper(nullptr)
-    , titleBarHeight(0)
-    , maximized(false)
-{
-}
+FramelessHelperPrivate::FramelessHelperPrivate() : window(nullptr), helper(nullptr), titleBarHeight(0), maximized(false) {}
 
-FramelessHelperPrivate::~FramelessHelperPrivate()
-{
-}
+FramelessHelperPrivate::~FramelessHelperPrivate() {}
 
-QMargins FramelessHelperPrivate::draggableMargins() const
-{
-    return priDraggableMargins;
-}
+QMargins FramelessHelperPrivate::draggableMargins() const { return priDraggableMargins; }
 
-QMargins FramelessHelperPrivate::maximizedMargins() const
-{
-    return priMaximizedMargins;
-}
+QMargins FramelessHelperPrivate::maximizedMargins() const { return priMaximizedMargins; }
+bool FramelessHelperPrivate::disableMaximized() const { return window ? window->property("disableMaximized").toBool() : false; }
 
-bool FramelessHelperPrivate::hitTest(const QPoint &pos) const
-{
-    int scaledTitleBarHeight = titleBarHeight * helper->scaleFactor();
+bool FramelessHelperPrivate::hitTest(const QPoint &pos) const {
+    int scaledTitleBarHeight = titleBarHeight;  //* helper->scaleFactor();
 
     if (!window)
         return false;
     else if (scaledTitleBarHeight == 0)
         return false;
-    else if ((scaledTitleBarHeight > 0)
-             && (pos.y() >= scaledTitleBarHeight))
+    else if ((scaledTitleBarHeight > 0) && (pos.y() >= scaledTitleBarHeight))
         return false;
 
     int currentIndex = -1;
