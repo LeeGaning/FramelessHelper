@@ -100,12 +100,6 @@ bool FramelessHelper::isMaximized() const {
 
     return d->maximized;
 }
-void FramelessHelper::setDisableMaximized(bool disable) {
-    Q_D(FramelessHelper);
-    if (d->window) {
-        d->window->setProperty("disableMaximized", disable);
-    }
-}
 
 void FramelessHelper::triggerMinimizeButtonAction() {
     Q_D(FramelessHelper);
@@ -118,7 +112,6 @@ void FramelessHelper::triggerMinimizeButtonAction() {
 void FramelessHelper::triggerMaximizeButtonAction() {
     Q_D(FramelessHelper);
     if (d->window) {
-        if (d->window->property("disableMaximized").toBool()) return;
         if (d->window->windowState() & Qt::WindowMaximized) {
             d->window->showNormal();
         } else {
@@ -182,7 +175,6 @@ FramelessHelperPrivate::~FramelessHelperPrivate() {}
 QMargins FramelessHelperPrivate::draggableMargins() const { return priDraggableMargins; }
 
 QMargins FramelessHelperPrivate::maximizedMargins() const { return priMaximizedMargins; }
-bool FramelessHelperPrivate::disableMaximized() const { return window ? window->property("disableMaximized").toBool() : false; }
 
 bool FramelessHelperPrivate::hitTest(const QPoint &pos) const {
     int scaledTitleBarHeight = titleBarHeight;  //* helper->scaleFactor();

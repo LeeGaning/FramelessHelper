@@ -17,7 +17,6 @@ class NativeWindowHelperPrivate {
     void updateWindowStyle();
     int hitTest(int x, int y) const;
     bool isMaximized() const;
-    bool disableMaximized() const;
 
    public:
     QMargins draggableMargins() const;

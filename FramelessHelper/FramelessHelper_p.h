@@ -15,7 +15,6 @@ class FramelessHelperPrivate : public NativeWindowTester {
    public:
     QMargins draggableMargins() const final;
     QMargins maximizedMargins() const final;
-    bool disableMaximized() const final;
     bool hitTest(const QPoint &pos) const final;
 
    public:

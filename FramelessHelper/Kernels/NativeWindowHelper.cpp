@@ -39,9 +39,9 @@ NativeWindowHelper::NativeWindowHelper(QWindow *window, NativeWindowTester *test
             d->window->installEventFilter(this);
             d->updateWindowStyle();
         }
-        if (d->disableMaximized()) QtWin::setCompositionEnabled(false);
         // 尝试解决多屏撕裂
         connect(window, &QWindow::screenChanged, this, [=] {
+            qDebug() << "screenChanged";
             auto hWnd = reinterpret_cast<HWND>(window->winId());
             SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
         });
@@ -95,8 +95,8 @@ bool NativeWindowHelper::nativeEventFilter(void *msg, long *result) {
                 QRect g = d->availableGeometry();
                 QMargins m = d->maximizedMargins();
 
-                params.rgrc[0].top = g.top() - m.top();
-                params.rgrc[0].left = g.left() - m.left();
+                params.rgrc[0].top = g.top() - m.top() - 1;
+                params.rgrc[0].left = g.left() - m.left() - 1;
                 params.rgrc[0].right = g.right() + m.right() + 1;
                 params.rgrc[0].bottom = g.bottom() + m.bottom() + 1;
             }
@@ -121,7 +121,6 @@ bool NativeWindowHelper::nativeEventFilter(void *msg, long *result) {
         if (result) *result = HTNOWHERE;
         return true;
     } else if (WM_NCLBUTTONDBLCLK == lpMsg->message) {
-        if (d->disableMaximized()) return true;
         auto minimumSize = d->window->minimumSize();
         auto maximumSize = d->window->maximumSize();
         if ((minimumSize.width() >= maximumSize.width()) || (minimumSize.height() >= maximumSize.height())) {
@@ -287,8 +286,6 @@ bool NativeWindowHelperPrivate::isMaximized() const {
 QMargins NativeWindowHelperPrivate::draggableMargins() const { return tester ? tester->draggableMargins() * scaleFactor : QMargins(); }
 
 QMargins NativeWindowHelperPrivate::maximizedMargins() const { return tester ? tester->maximizedMargins() * scaleFactor : QMargins(); }
-
-bool NativeWindowHelperPrivate::disableMaximized() const { return tester ? tester->disableMaximized() : false; }
 
 QRect NativeWindowHelperPrivate::availableGeometry() {
     MONITORINFO mi{0};

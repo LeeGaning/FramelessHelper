@@ -10,7 +10,6 @@ class NativeWindowTester
 public:
     virtual QMargins draggableMargins() const = 0;
     virtual QMargins maximizedMargins() const = 0;
-    virtual bool disableMaximized() const = 0;
 
     virtual bool hitTest(const QPoint &pos) const = 0;
 };
